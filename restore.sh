@@ -11,6 +11,7 @@ chown -R www-data:www-data /var/www/pterodactyl
 
 echo "=== [4/7] Install ulang dependency PHP & NodeJS ==="
 composer install --no-dev --optimize-autoloader
+npm install --legacy-peer-deps
 
 echo "=== [5/7] Build ulang frontend ==="
 npm run build:production
