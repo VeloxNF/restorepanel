@@ -1,28 +1,28 @@
-echo "=== [1/7] Hapus cache & dependency lama ==="
-rm -rf node_modules package-lock.json yarn.lock
+echo "=== [1/9] #Enter Maintenance Mode ==="
+php artisan down
 
-echo "=== [2/7] Download ulang panel (latest) ==="
-curl -L https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz
-
-echo "=== [3/7] Ekstrak panel ==="
-tar -xzvf panel.tar.gz
+echo "=== [2/9] #Download the Update ==="
+curl -L https://github.com/pterodactyl/panel/releases/latest/download/panel.tar.gz | tar -xzv
 chmod -R 755 storage/* bootstrap/cache
-chown -R www-data:www-data /var/www/pterodactyl
 
-echo "=== [4/7] Install ulang dependency PHP & NodeJS ==="
+echo "=== [4/9] #Update Dependencies ==="
 composer install --no-dev --optimize-autoloader
-npm install --legacy-peer-deps
 
-echo "=== [5/7] Build ulang frontend ==="
-npm run build:production
-
-echo "=== [6/7] Clear cache Laravel ==="
+echo "=== [5/9] #Clear Compiled Template Cache ==="
 php artisan view:clear
 php artisan config:clear
-php artisan cache:clear
 
-echo "=== [7/7] Restart all service ==="
-systemctl restart nginx
-systemctl restart php8.3-fpm
+echo "=== [6/9] #Database Updates ==="
+php artisan migrate --seed --force
 
-echo "=== Berhasil! Panel telah di restore ke default... ==="
+echo "=== [7/9] #Set Permissions ==="
+chown -R www-data:www-data /var/www/pterodactyl/*
+
+echo "=== [8/9] #Restarting Queue Workers ==="
+php artisan queue:restart
+
+echo "=== [9/9] #Exit Maintenance Mode ==="
+php artisan up
+
+echo "=== ALL DONE ==="
+echo "=== Thankyou for using this script ==="
